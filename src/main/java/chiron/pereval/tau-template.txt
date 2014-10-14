@@ -1,0 +1,2 @@
+"method [{filepath} {,}]" calls subcalls exclusivetime inclusivetime 0 GROUP="groupname"
+"main [{/home1/00990/camata/projects/ParallelOctreeC/test_mesh.c} {229,0}]" 1 200013 25350.23046875 357619846.5136719 0 GROUP="TAU_DEFAULT" 

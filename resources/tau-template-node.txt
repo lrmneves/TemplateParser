@@ -1,0 +1,2 @@
+1000 templated_functions_MULTI_LINUX_TIMERS
+# Name Calls Subrs Excl Incl ProfileCalls # <metadata><attribute><name>Metric Name</name><value>LINUX_TIMERS</value></attribute><attribute><name>Starting Timestamp</name><value>1369008185590248</value></attribute><attribute><name>Timestamp</name><value>1369008185590211</value></attribute><attribute><name>pid</name><value>0001</value></attribute></metadata>
