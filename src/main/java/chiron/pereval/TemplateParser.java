@@ -9,9 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TemplateParser {
-    public static final String TIMESTAMP = "<name>Timestamp</name>";
+    public static final String TIMESTAMP = "<name>Timestamp</name><value>\\d+</value>";
     public static final String UTCTIME = "<name>UTC Time</name>";
-    public static final String VALUE_REGEX = "<value>\\d+</value>";
+    public static final String PID = "<name>pid</name><value>\\d+</value>";
     public static void main(String[] args) {
         try {
 
@@ -52,15 +52,18 @@ public class TemplateParser {
             BufferedReader br = new BufferedReader(new FileReader("resources/tau-template-supernode.txt"));
 
             String line;
-            Pattern pattern = Pattern.compile(TIMESTAMP + VALUE_REGEX);
-            Pattern timestampPat = Pattern.compile("\\d+<");
+            Pattern timestampPat = Pattern.compile(TIMESTAMP);
+            Pattern pidPat = Pattern.compile(PID);
             while ( (line = br.readLine()) != null) {
-                Matcher matcher = pattern.matcher(line);
+                Matcher timestampMatcher = timestampPat.matcher(line);
+                Matcher pidMatcher = pidPat.matcher(line);
+
                 // check all occurance
-                while (matcher.find()) {
-                    Matcher timestampMat = timestampPat.matcher(matcher.group());
-                    timestampMat.find();
-                    System.out.println(timestampMat.group().replace("<",""));
+                while (timestampMatcher.find()) {
+                    System.out.println(timestampMatcher.group());
+                }
+                while (pidMatcher.find()) {
+                    System.out.println(pidMatcher.group());
                 }
             }
             br.close();
