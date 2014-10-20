@@ -21,8 +21,8 @@ public class TemplateParser {
     public static final String DB_PASS = "postgres";
     public static final String SUPER_TEMPLATE_PATH = "resources/tau-template-supernode.txt";
     public static final String NODE_TEMPLATE_PATH = "resources/tau-template.txt";
-    public static final String SUPERNODE_OUTPUT_PATH = "resources/superNodeOutput.txt";
-    public static final String NODE_OUTPUT_PATH = "resources/outputNode";
+    public static final String SUPERNODE_OUTPUT_PATH = "output/superNodeOutput.txt";
+    public static final String NODE_OUTPUT_PATH = "output/outputNode";
     public static final String CALL = "1";
     public static final String SUBCALL = "0";
     public static HashMap<String,String> methodNameMap = new HashMap<String, String>();
