@@ -5,7 +5,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.sql.*;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,13 +19,15 @@ public class TemplateParser {
     public static final String JDBC = "jdbc:postgresql://127.0.0.1:5433/base-scc2";
     public static final String DB_USER = "postgres";
     public static final String DB_PASS = "postgres";
-    public static final String TEMPLATE_PATH = "resources/tau-template-supernode.txt";
-    public static final String OUTPUT_PATH = "resources/output-test.txt";
+    public static final String SUPER_TEMPLATE_PATH = "resources/tau-template-supernode.txt";
+    public static final String NODE_TEMPLATE_PATH = "resources/tau-template.txt";
+    public static final String SUPERNODE_OUTPUT_PATH = "resources/superNodeOutput.txt";
+    public static final String NODE_OUTPUT_PATH = "resources/outputNode";
     public static final String CALL = "1";
     public static final String SUBCALL = "0";
     public static HashMap<String,String> methodNameMap = new HashMap<String, String>();
     public static HashMap<String,String> methodClassMap = new HashMap<String, String>();
-
+    public static LinkedHashMap<Integer,StringBuilder> bufferMap= new LinkedHashMap<Integer,StringBuilder>();
 
     public static void main(String[] args) {
 
@@ -39,45 +44,64 @@ public class TemplateParser {
         }
 
         try{
-            StringBuffer buffer = new StringBuffer();
-            BufferedReader br = new BufferedReader(new FileReader(TEMPLATE_PATH));
-
+            StringBuilder superNode = new StringBuilder();
+            BufferedReader superBr = new BufferedReader(new FileReader(SUPER_TEMPLATE_PATH));
             String line;
-            Pattern timestampPat = Pattern.compile(TIMESTAMP);
-            Pattern pidPat = Pattern.compile(PID);
-            while ( (line = br.readLine()) != null) {
-                boolean read = false;
-                Matcher timestampMatcher = timestampPat.matcher(line);
-                Matcher pidMatcher = pidPat.matcher(line);
-                // check all occurance
-                while (timestampMatcher.find()) {
-                    System.out.println(timestampMatcher.group());
-                }
-                while (pidMatcher.find()) {
-                    System.out.println(pidMatcher.group());
-                }
-                if(!read){
-                    buffer.append(line);
-                }
+            while ( (line = superBr.readLine()) != null) {
+//                boolean read = false;
+//                Matcher timestampMatcher = timestampPat.matcher(line);
+//                Matcher pidMatcher = pidPat.matcher(line);
+//                // check all occurance
+//                while (timestampMatcher.find()) {
+//                    System.out.println(timestampMatcher.group());
+//                }
+//                while (pidMatcher.find()) {
+//                    System.out.println(pidMatcher.group());
+//                }
+//                if(!read){
+                    superNode.append(line);
+//                }
             }
-            br.close();
+            superBr.close();
+
+            StringBuilder node = new StringBuilder();
+            BufferedReader nodeBr = new BufferedReader(new FileReader(NODE_TEMPLATE_PATH));
+            while((line = nodeBr.readLine()) != null){
+                node.append(line);
+            }
+            nodeBr.close();
 
             PreparedStatement pst = null;
             ResultSet rs = null;
-            pst = connection.prepareStatement("SELECT metric,etime,provfunction FROM eperfeval");
+            pst = connection.prepareStatement("SELECT metric,etime,provfunction,machineid FROM eperfeval");
             rs = pst.executeQuery();
-
             while (rs.next()) {
+                if(!bufferMap.containsKey(rs.getInt(4))){
+                    bufferMap.put(rs.getInt(4),new StringBuilder());
+                }
                 //"method [{filepath} {,}]" calls subcalls exclusivetime inclusivetime 0 GROUP="groupname"
                 String row = "\""+rs.getString(3) + " [" + methodClassMap.get(rs.getString(1)) + "]\"" + " " + CALL + " " + SUBCALL
                         +" " +rs.getInt(2) + " " + rs.getInt(2) + " 0 GROUP=\"" + methodNameMap.get(rs.getString(1)) + "\"";
-                buffer.append("\n"+row);
+                bufferMap.get(rs.getInt(4)).append("\n" + row);
             }
-            System.out.println(buffer.toString());
-            BufferedWriter bw = new BufferedWriter(new FileWriter(OUTPUT_PATH));
-            bw.append(buffer.toString());
-            bw.flush();
-            bw.close();
+
+            boolean supernode = true;
+
+            for(int k : bufferMap.keySet()){
+                if(supernode){
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(SUPERNODE_OUTPUT_PATH));
+                    bw.append(superNode.toString() + bufferMap.get(k).toString());
+                    bw.flush();
+                    bw.close();
+                    supernode = false;
+                }
+                else{
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(NODE_OUTPUT_PATH+k+".txt"));
+                    bw.append(node.toString() + bufferMap.get(k).toString());
+                    bw.flush();
+                    bw.close();
+                }
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
