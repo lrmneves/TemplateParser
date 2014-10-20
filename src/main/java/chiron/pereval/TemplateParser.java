@@ -80,7 +80,7 @@ public class TemplateParser {
                     bufferMap.put(rs.getInt(4),new StringBuilder());
                 }
                 //"method [{filepath} {,}]" calls subcalls exclusivetime inclusivetime 0 GROUP="groupname"
-                String row = "\""+rs.getString(3) + " [" + methodClassMap.get(rs.getString(1)) + "]\"" + " " + CALL + " " + SUBCALL
+                String row = "\""+ (rs.getString(3) != null?rs.getString(3)+" ":"") + "[" + methodClassMap.get(rs.getString(1)) + "]\"" + " " + CALL + " " + SUBCALL
                         +" " +rs.getInt(2) + " " + rs.getInt(2) + " 0 GROUP=\"" + methodNameMap.get(rs.getString(1)) + "\"";
                 bufferMap.get(rs.getInt(4)).append("\n" + row);
             }
